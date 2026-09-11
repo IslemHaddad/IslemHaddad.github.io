@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Islem Haddad, platform engineer</title>
+<meta name="description" content="Islem Haddad, lead DevOps and platform engineer: production Kubernetes, CI/CD, GitOps, observability and low-downtime migrations. CKA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDF0EC;
+    --ink: #1A2420;
+    --muted: #56635D;
+    --rule: #C6CFC8;
+    --up: #2F8F5B;
+    --up-soft: #D5E6DA;
+    --window: #D08C1F;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--up); }
+  :focus-visible { outline: 2px solid var(--up); outline-offset: 3px; border-radius: 2px; }
+
+  .wrap { max-width: 1080px; margin-inline: auto; padding-inline: 28px; }
+
+  /* Header */
+  header { padding: 56px 0 8px; }
+  .top {
+    display: flex; flex-wrap: wrap; gap: 24px 40px;
+    justify-content: space-between; align-items: flex-end;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    margin: 0;
+  }
+  .role {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+    margin: 14px 0 0;
+    color: var(--muted);
+  }
+  .links { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-weight: 500; }
+  .cv {
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    padding: 10px 18px; border-radius: 6px; text-decoration: none;
+  }
+  .cv:hover { background: var(--up); color: #fff; }
+  .intro { max-width: 62ch; margin: 36px 0 0; font-size: 1.2rem; line-height: 1.55; }
+
+  /* Migration timeline: the one bold element */
+  .migration { margin: 64px 0 24px; }
+  .migration h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+    line-height: 1.1; letter-spacing: -0.02em;
+    margin: 0 0 28px; max-width: 22ch;
+  }
+  .run, .labels { display: grid; grid-template-columns: 23fr 1fr 6fr; }
+  .ends { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+  .ends span:last-child { color: var(--up); }
+  .run { height: 72px; animation: draw 2.2s cubic-bezier(.3,.1,.2,1) .3s both; }
+  .seg-a {
+    background:
+      linear-gradient(90deg, var(--up) 0 2px, transparent 2px) 0 0 / calc(100% / 23) 100% repeat-x,
+      var(--up-soft);
+    border-radius: 4px 0 0 4px;
+  }
+  .seg-cut { background: var(--window); }
+  .seg-b { background: var(--up); border-radius: 0 4px 4px 0; }
+  .labels { margin-top: 12px; font-size: 0.95rem; color: var(--muted); }
+  .labels .l-a { padding-right: 16px; }
+  .labels .l-cut {
+    grid-column: 2 / 4;
+    border-left: 2px solid var(--window);
+    padding-left: 10px;
+    color: var(--ink); font-weight: 600;
+  }
+  .scale { margin: 18px 0 0; font-size: 0.9rem; color: var(--muted); max-width: 70ch; }
+  @keyframes draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @media (prefers-reduced-motion: reduce) { .run { animation: none; } }
+
+  /* Sections */
+  section { padding: 56px 0; border-top: 1px solid var(--rule); }
+  section > h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 1.9rem; letter-spacing: -0.015em; line-height: 1.15;
+    margin: 0 0 32px;
+  }
+
+  .work { display: grid; gap: 0; }
+  .item {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 12px 48px; padding: 24px 0; border-top: 1px solid var(--rule);
+  }
+  .item:first-child { border-top: 0; padding-top: 0; }
+  .item h3 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 1.3rem; line-height: 1.25; margin: 0;
+  }
+  .item p { margin: 0; max-width: 66ch; }
+  .item .fact { display: block; margin-top: 6px; color: var(--muted); font-size: 0.95rem; }
+
+  /* Career: a real sequence, so it gets a timeline */
+  .career { list-style: none; margin: 0; padding: 0; position: relative; }
+  .career::before {
+    content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px;
+    width: 2px; background: var(--rule);
+  }
+  .career li { position: relative; padding: 0 0 30px 40px; }
+  .career li:last-child { padding-bottom: 0; }
+  .career li::before {
+    content: ""; position: absolute; left: 0; top: 7px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--muted);
+  }
+  .career li:first-child::before { background: var(--up); border-color: var(--up); }
+  .career .when { color: var(--muted); font-size: 0.95rem; }
+  .career h3 { font-family: var(--display); font-weight: 600; font-size: 1.2rem; margin: 2px 0 4px; }
+  .career p { margin: 0; max-width: 66ch; }
+  .employer { margin: -16px 0 28px; color: var(--muted); }
+
+  /* Toolbox */
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px 48px; margin: 0; }
+  .tools dt { font-weight: 600; margin-bottom: 4px; }
+  .tools dd { margin: 0; color: var(--muted); }
+
+  .creds { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px 48px; }
+  .creds h3 { font-family: var(--display); font-weight: 600; font-size: 1.2rem; margin: 0 0 8px; }
+  .creds ul { margin: 0; padding-left: 1.1em; }
+  .creds li { margin-bottom: 6px; }
+
+  footer { padding-block: 64px 72px; background: linear-gradient(var(--rule), var(--rule)) 28px 0 / calc(100% - 56px) 1px no-repeat; }
+  footer h2 {
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.03em; line-height: 1;
+    margin: 0 0 20px;
+  }
+  footer p { margin: 0 0 24px; max-width: 60ch; color: var(--muted); }
+  .mail { font-family: var(--display); font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    header { padding-top: 36px; }
+    .item { grid-template-columns: 1fr; }
+    .run { height: 56px; }
+    .labels { grid-template-columns: 1fr; gap: 10px; }
+    .labels .l-cut { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="top">
+    <div>
+      <h1>Islem<br>Haddad</h1>
+      <p class="role">Lead DevOps and platform engineer</p>
+    </div>
+    <nav class="links" aria-label="Contact">
+      <a href="mailto:Haddadislam64@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/islem-haddad-265ba7181/">LinkedIn</a>
+      <a href="https://github.com/IslemHaddad">GitHub</a>
+      <a class="cv" href="CV_HADDAD_ISLEM_Platform_Engineer.pdf" download>Download CV</a>
+    </nav>
+  </div>
+  <p class="intro">
+    I build and run production infrastructure for government and high-traffic platforms:
+    Kubernetes clusters, delivery pipelines, monitoring and logging, and migrations short
+    enough that users barely notice. Certified Kubernetes Administrator, based in Algeria (UTC+1).
+  </p>
+
+  <div class="migration">
+    <h2>Moving a whole data center with 5 minutes of downtime</h2>
+    <div class="ends" aria-hidden="true"><span>Site A</span><span>Site B</span></div>
+    <div class="run" role="img"
+         aria-label="Timeline of the migration: Site A stays live while databases sync every 5 minutes, then a 5-minute cutover window, then Site B is live.">
+      <div class="seg-a"></div>
+      <div class="seg-cut"></div>
+      <div class="seg-b"></div>
+    </div>
+    <div class="labels">
+      <span class="l-a">Each tick is a database sync, run every 5 minutes by Bash automation while Site A stayed live.</span>
+      <span class="l-cut">5 minutes of downtime at cutover</span>
+    </div>
+    <p class="scale">Drawn to scale: the cutover window is exactly as wide as one sync interval.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section aria-labelledby="work">
+    <h2 id="work">Selected work</h2>
+    <div class="work">
+      <article class="item">
+        <h3>Data center migration, Site A to Site B</h3>
+        <p>Planned and ran the full infrastructure move. Custom automation scripts handled the migration,
+          and Bash jobs kept the databases synchronized every 5 minutes right up to the switch.
+          <span class="fact">5 minutes of downtime at cutover, with zero data loss.</span></p>
+      </article>
+      <article class="item">
+        <h3>Production Kubernetes</h3>
+        <p>Designed, deployed and operate the company's production Kubernetes clusters, including
+          high-availability storage and networking for critical workloads. Led the migration of two
+          high-traffic platforms, keeping downtime minimal and tuning performance and resource usage after cutover.
+          <span class="fact">CKA certified, September 2026.</span></p>
+      </article>
+      <article class="item">
+        <h3>15+ platforms from development to production</h3>
+        <p>Set up development, testing, pre-production and production environments for more than 15 platforms.
+          Jenkins pipelines ran build agents on private infrastructure, ZStack and VPS; Docker Swarm and K3s ran
+          the workloads; Ansible and Bash automated provisioning and delivery. Monitoring and alerting with
+          Prometheus, Grafana and Alertmanager, and centralized logs with Loki and ELK.</p>
+      </article>
+      <article class="item">
+        <h3>Gas Summit 2024 badge accreditation</h3>
+        <p>Designed the system as a software engineer: architecture, database schema, and communication across
+          three interconnected platforms with real-time PDA synchronization. Then, as a DevOps engineer,
+          led its production deployment and monitoring, with fault-tolerant links between the systems.</p>
+      </article>
+      <article class="item">
+        <h3>Government platforms</h3>
+        <p>Led the zero-downtime migration of association.mjeunesse.gov.dz, took artisanat.mta.gov.dz to production
+          over a secure VPN to government systems, and deployed internal systems for tourisme.mta.gov.dz.
+          Earlier, delivered the Ministry of Tourism and Handicrafts' artisanal activities system with a redundant,
+          high-availability deployment serving all 58 provinces.
+          <span class="fact">Technical lead in securing two government managed-services contracts.</span></p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="career">
+    <h2 id="career">Career</h2>
+    <p class="employer">All at the Digital Transformation Support Company (EADN), Algeria: from writing the applications to running the platform they live on.</p>
+    <ol class="career">
+      <li>
+        <span class="when">October 2025 to now</span>
+        <h3>Lead / Architect DevOps</h3>
+        <p>Run production Kubernetes, lead data center and platform migrations, and served as technical lead on two managed-services contracts.</p>
+      </li>
+      <li>
+        <span class="when">August 2024 to October 2025</span>
+        <h3>Senior IT Engineer (DevOps)</h3>
+        <p>Led a DevOps team, defining system architectures, environment strategy and documentation processes across 15+ platforms.</p>
+      </li>
+      <li>
+        <span class="when">December 2023 to August 2024</span>
+        <h3>Senior Software Engineer</h3>
+        <p>Designed and delivered the Gas Summit 2024 badge accreditation system.</p>
+      </li>
+      <li>
+        <span class="when">December 2021 to December 2023</span>
+        <h3>Analyst Developer</h3>
+        <p>Led requirements and delivery of a ministry platform deployed across all 58 provinces.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="tools">
+    <h2 id="tools">Toolbox</h2>
+    <dl class="tools">
+      <div><dt>Orchestration</dt><dd>Kubernetes (production, HA storage and networking), K3s, Docker Swarm</dd></div>
+      <div><dt>Infrastructure as code and GitOps</dt><dd>Terraform, Argo CD, Ansible, Bash</dd></div>
+      <div><dt>CI/CD</dt><dd>Jenkins pipelines with distributed build agents</dd></div>
+      <div><dt>Observability</dt><dd>Prometheus, Grafana, Alertmanager for metrics and alerts; Loki and ELK for logs</dd></div>
+      <div><dt>Cloud and infrastructure</dt><dd>Google Cloud (Terraform-provisioned test environments), private data centers, ZStack, KVM, Hyper-V, VPS</dd></div>
+      <div><dt>Networking and security</dt><dd>HAProxy, NGINX, IPSec and OpenVPN, Linux (Ubuntu)</dd></div>
+    </dl>
+  </section>
+
+  <section aria-labelledby="creds">
+    <h2 id="creds">Certifications and education</h2>
+    <div class="creds">
+      <div>
+        <h3>Certifications</h3>
+        <ul>
+          <li>Certified Kubernetes Administrator (CKA), CNCF, September 2026</li>
+          <li>Kubernetes and Cloud Native Associate (KCNA), CNCF</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Education</h3>
+        <ul>
+          <li>Master's in Computer Systems Engineering and Web Technologies, University Yahia Fares, Medea (2019 to 2021)</li>
+          <li>Bachelor's in Computer Systems, University Yahia Fares, Medea (2016 to 2019)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <h2>Let's talk</h2>
+  <p>I work in English, with intermediate French, in Paris working hours. Email is the fastest way to reach me.</p>
+  <a class="mail" href="mailto:Haddadislam64@gmail.com">Haddadislam64@gmail.com</a>
+</footer>
+
+</body>
+</html>
