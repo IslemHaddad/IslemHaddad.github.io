@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adding AI review to CI/CD without trusting it blindly, by Islem Haddad</title>
+<meta name="description" content="A design proposal, written as an architecture decision record, for layering AI-assisted review on top of deterministic quality and security gates in CI/CD.">
+<link rel="canonical" href="https://islemhaddad.github.io/ai-quality-gates.html">
+<meta property="og:title" content="Adding AI review to CI/CD without trusting it blindly">
+<meta property="og:description" content="Deterministic gates block, AI gates advise, and an AI check blocks only once it has proven precise.">
+<meta property="og:url" content="https://islemhaddad.github.io/ai-quality-gates.html">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDF0EC;
+    --ink: #1A2420;
+    --muted: #56635D;
+    --rule: #C6CFC8;
+    --up: #2F8F5B;
+    --up-soft: #D5E6DA;
+    --window: #D08C1F;
+    --window-soft: #F3E3C6;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--body); font-size: 1.0625rem; line-height: 1.65;
+  }
+  a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--up); }
+  :focus-visible { outline: 2px solid var(--up); outline-offset: 3px; border-radius: 2px; }
+  code { font-size: 0.92em; background: var(--up-soft); padding: 1px 5px; border-radius: 3px; }
+
+  .wrap { max-width: 1080px; margin-inline: auto; padding-inline: 28px; }
+  .prose > * { max-width: 68ch; }
+
+  .home { display: inline-block; margin: 32px 0 0; font-family: var(--display); font-weight: 600; text-decoration: none; }
+
+  header.article-head { padding-block: 48px 8px; }
+  h1 {
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(2.2rem, 5.6vw, 3.9rem); line-height: 1.02; letter-spacing: -0.03em;
+    margin: 0; max-width: 20ch;
+  }
+  .dek { font-size: 1.25rem; line-height: 1.5; color: var(--muted); margin: 20px 0 0; max-width: 58ch; }
+  .adr-meta { display: flex; flex-wrap: wrap; gap: 8px 40px; margin: 28px 0 0; padding: 0; }
+  .adr-meta div { display: flex; gap: 8px; }
+  .adr-meta dt { color: var(--muted); }
+  .adr-meta dd { margin: 0; font-weight: 600; }
+
+  .why {
+    margin: 36px 0 8px; padding: 18px 22px; max-width: 68ch;
+    background: var(--up-soft); border-radius: 6px;
+  }
+  .why p { margin: 0; }
+
+  article h2 {
+    font-family: var(--display); font-weight: 600; font-size: 1.75rem;
+    letter-spacing: -0.015em; line-height: 1.2; margin: 56px 0 14px;
+  }
+  article h3 { font-family: var(--display); font-weight: 600; font-size: 1.25rem; margin: 32px 0 8px; }
+  article p { margin: 0 0 16px; }
+  article ul, article ol { margin: 0 0 16px; padding-left: 1.3em; }
+  article li { margin-bottom: 8px; }
+  .chosen { color: var(--up); font-weight: 600; }
+
+  /* Pipeline diagram: a real sequence of passage points */
+  .pipeline {
+    list-style: none; padding: 0; margin: 28px 0 12px;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+    counter-reset: stage;
+  }
+  .pipeline > li {
+    counter-increment: stage; margin: 0;
+    padding: 0 18px 0 0; position: relative;
+  }
+  .stage-name {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 600; font-size: 1.15rem;
+    padding-bottom: 12px; margin-bottom: 14px; border-bottom: 3px solid var(--ink);
+  }
+  .stage-name::before {
+    content: counter(stage);
+    display: inline-grid; place-items: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--ink); color: var(--paper); font-size: 0.95rem;
+  }
+  .pipeline > li:not(:last-child) .stage-name { margin-right: -18px; }
+  .gates { list-style: none; padding: 0; margin: 0 0 10px; }
+  .gates li {
+    padding: 7px 10px; margin-bottom: 6px; border-radius: 4px;
+    font-size: 0.95rem; line-height: 1.4; background: #fff;
+    border-left: 3px solid var(--ink);
+  }
+  .gates li.ai { background: var(--window-soft); border-left-color: var(--window); }
+  .gates li.watch { background: var(--up-soft); border-left-color: var(--up); }
+  .gates small { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 0.95rem; color: var(--muted); margin: 8px 0 0; }
+  .legend span::before {
+    content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+    vertical-align: -2px; margin-right: 8px; background: #fff; border-left: 3px solid var(--ink);
+  }
+  .legend span.ai::before { background: var(--window-soft); border-left-color: var(--window); }
+  .legend span.watch::before { background: var(--up-soft); border-left-color: var(--up); }
+
+  footer { padding-block: 56px 72px; margin-top: 64px; background: linear-gradient(var(--rule), var(--rule)) 28px 0 / calc(100% - 56px) 1px no-repeat; }
+  footer p { margin: 0 0 8px; color: var(--muted); max-width: 60ch; }
+
+  @media (max-width: 860px) {
+    .pipeline { grid-template-columns: 1fr 1fr; gap: 28px 0; }
+    .pipeline > li:nth-child(2n) .stage-name { margin-right: 0; }
+  }
+  @media (max-width: 560px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .pipeline > li { padding-right: 0; }
+    .pipeline > li .stage-name { margin-right: 0 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap"><a class="home" href="index.html">Islem Haddad</a></div>
+
+<header class="wrap article-head">
+  <h1>Adding AI review to CI/CD without trusting it blindly</h1>
+  <p class="dek">A design proposal, written as an architecture decision record, for layering AI-assisted review on top of deterministic quality and security gates.</p>
+  <dl class="adr-meta">
+    <div><dt>Status</dt><dd>Proposed</dd></div>
+    <div><dt>Date</dt><dd>September 2026</dd></div>
+    <div><dt>Author</dt><dd>Islem Haddad</dd></div>
+  </dl>
+  <div class="why">
+    <p>I build Jenkins pipelines and run Argo&nbsp;CD in production. Teams now write more code with AI agents than people can carefully review, so the pipeline has to carry more of the judgment. This is how I would design that, in the format I would use to propose it to a team.</p>
+  </div>
+</header>
+
+<main class="wrap">
+<article class="prose">
+
+  <h2>Context</h2>
+  <p>Picture a small senior team where humans and AI agents both write code. Writing is no longer the slow part. Review is.</p>
+  <p>Most quality gates today are deterministic. They answer questions like "is it formatted", "do the tests pass" and "does it pull in a known vulnerability" very well. They cannot answer "is this change risky", "is the rollback path clear" or "does the runbook still match what the code does". Those questions land on human reviewers, who are the scarcest resource on the team.</p>
+  <p>The example stack for this proposal is Rust services and a React frontend on managed Kubernetes in Google Cloud, with Terraform for infrastructure and Argo&nbsp;CD for delivery. The ideas carry over to any CI system: GitHub Actions, GitLab CI or Jenkins.</p>
+
+  <h2>Decision drivers</h2>
+  <ul>
+    <li>Nothing reaches production on an AI's word alone.</li>
+    <li>Every gate is code: versioned, reviewed, and runnable on a laptop with the same result as in CI.</li>
+    <li>Policy is enforced twice, in the pipeline and at the cluster. Under GitOps the cluster is the last gate, so it has to hold on its own.</li>
+    <li>A gate earns trust with measured results, not with assumptions.</li>
+    <li>When a gate fails, it says how to fix the problem.</li>
+  </ul>
+
+  <h2>Options considered</h2>
+  <h3>Deterministic gates only</h3>
+  <p>Predictable, cheap and well understood. But every judgment call still falls on people, and that stops scaling once AI agents multiply the number of changes.</p>
+  <h3>An AI reviewer that blocks from day one</h3>
+  <p>It would catch more, but model output is not deterministic, it can be confidently wrong, and it can be steered by text hidden in the pull request itself (prompt injection). A noisy gate that blocks merges teaches people to ignore it or work around it, which is worse than having no gate.</p>
+  <h3>Layered gates <span class="chosen">(chosen)</span></h3>
+  <p>Deterministic checks block. AI checks advise. An AI check is promoted to blocking only after it has proven precise on real pull requests, and it is demoted again if its precision drops.</p>
+
+  <h2>Decision</h2>
+  <p>Adopt the layered model across four passage points. Every change moves through them in order.</p>
+</article>
+
+<ol class="pipeline" aria-label="The four passage points of the pipeline">
+  <li>
+    <div class="stage-name">Pull request</div>
+    <ul class="gates">
+      <li>Format, lint and tests<small>cargo fmt, clippy with warnings as errors, ESLint</small></li>
+      <li>Dependency and license audit<small>cargo-deny, npm audit</small></li>
+      <li>Secret scan<small>gitleaks</small></li>
+      <li>Infrastructure and manifest policy<small>Trivy config scan, Conftest (OPA)</small></li>
+      <li>Protected resources<small>Terraform plan blocks destroy or replace without an approval label</small></li>
+      <li class="ai">AI review comment<small>risk, findings, missing docs</small></li>
+      <li class="ai">Terraform plan in plain language</li>
+    </ul>
+  </li>
+  <li>
+    <div class="stage-name">Build</div>
+    <ul class="gates">
+      <li>Reproducible build<small>pinned toolchains and base images</small></li>
+      <li>Image scan<small>Trivy, blocks on critical fixable CVEs</small></li>
+      <li>SBOM and signature<small>Syft, cosign</small></li>
+      <li class="ai">Failure explainer<small>likely cause and fix for any red job</small></li>
+    </ul>
+  </li>
+  <li>
+    <div class="stage-name">Deploy</div>
+    <ul class="gates">
+      <li>Argo&nbsp;CD sync from Git<small>no manual changes to the cluster</small></li>
+      <li>Admission policy<small>Kyverno: signed images only, no :latest, limits set, non-root</small></li>
+      <li>Canary against SLOs<small>Argo Rollouts analysis on Prometheus metrics, automatic rollback</small></li>
+    </ul>
+  </li>
+  <li>
+    <div class="stage-name">Run</div>
+    <ul class="gates">
+      <li class="watch">SLO burn-rate alerts<small>every alert links to a runbook</small></li>
+      <li class="watch">Missing runbook is a bug<small>tracked like any other defect</small></li>
+    </ul>
+  </li>
+</ol>
+<p class="legend"><span>Blocks the change</span><span class="ai">Advises only (AI)</span><span class="watch">Watches production</span></p>
+
+<article class="prose">
+  <h3>What the AI reviewer does</h3>
+  <p>It reads the diff, the pull request description and the repository's written rules: the contributing guide, the ADR index and any runbook the change touches. It returns JSON that is validated against a schema and posted as a single comment with four parts:</p>
+  <ul>
+    <li><strong>Risk level</strong> (low, medium or high) with one sentence explaining why.</li>
+    <li><strong>Findings</strong> tied to a file and line, each one a question a senior reviewer would ask.</li>
+    <li><strong>Missing writing:</strong> behavior changed, but no ADR, runbook or doc changed with it. If it is not written down, it does not exist.</li>
+    <li><strong>Rollback:</strong> for migrations and infrastructure changes, whether the way back is stated.</li>
+  </ul>
+  <p>It never approves. Approval stays with a person.</p>
+  <p>A second, lower-risk use is the failure explainer. When a blocking gate fails, the model reads the job log and posts the likely cause and fix. It saves time on every red build and cannot let anything bad through.</p>
+
+  <h3>Guardrails</h3>
+  <ul>
+    <li><strong>Model output is untrusted input.</strong> The AI job runs in an isolated runner with a read-only token and no secrets, and it cannot approve or merge. The prompt tells the model that pull request content is data, not instructions, but the permissions are what actually enforce it.</li>
+    <li><strong>Everything is auditable.</strong> Pin the model version and log each prompt and response, so any finding can be traced and a change in behavior can be tied to a model update.</li>
+    <li><strong>Cost and latency stay bounded.</strong> Run on pull requests only, skip documentation-only changes, cap the diff size, and run in parallel with the other checks so it is never on the critical path.</li>
+    <li><strong>Know where the code goes.</strong> Confirm the provider's data retention terms before sending source code, or use a self-hosted model for sensitive repositories.</li>
+  </ul>
+
+  <h3>How an AI check earns the right to block</h3>
+  <p>Every AI finding is resolved as either fixed or dismissed, which gives a precision score for each type of check. A check is promoted to blocking only when it stays above about 90% precision for at least four weeks, over enough findings to mean something. It is demoted if it drops below that. Even a blocking AI check can be overridden by a person, with the reason recorded. The 90% figure is a starting point for the team to tune, not a rule.</p>
+
+  <h2>Consequences</h2>
+  <h3>Positive</h3>
+  <ul>
+    <li>Reviewers spend their time on design and risk instead of things a machine can find.</li>
+    <li>Documentation stays current, because drift is flagged on every pull request.</li>
+    <li>Security policy holds even if one layer is bypassed, because it is enforced in both the pipeline and the cluster.</li>
+    <li>Decisions about which gates to keep are backed by data.</li>
+  </ul>
+  <h3>Negative</h3>
+  <ul>
+    <li>The gates themselves become a product that needs an owner and maintenance.</li>
+    <li>Model usage costs money and adds a dependency on a provider.</li>
+    <li>Advisory checks will be noisy at first, until prompts and thresholds are tuned.</li>
+  </ul>
+
+  <h2>Rollout</h2>
+  <ol>
+    <li><strong>Weeks 1 and 2:</strong> deterministic pull request and build gates. Kyverno policies in audit mode, to see what would break before anything is blocked.</li>
+    <li><strong>Weeks 3 and 4:</strong> Kyverno moves to enforce. The AI reviewer and failure explainer go live, advisory only, on one repository.</li>
+    <li><strong>Weeks 5 to 10:</strong> measure precision, tune prompts, extend to the other repositories.</li>
+    <li><strong>After that:</strong> promote the checks that earned it, and revisit this ADR with the numbers.</li>
+  </ol>
+
+  <h2>How we will know it works</h2>
+  <p>Track the DORA metrics that matter here, change failure rate and lead time for changes, alongside three pipeline-specific ones: time from a red build to a fix, the share of AI findings that get fixed rather than dismissed, and the number of incidents where the runbook was missing or wrong.</p>
+  <p>If the change failure rate does not fall, or lead time goes up, the design is wrong and this record gets revised. That is the point of writing it down.</p>
+</article>
+</main>
+
+<footer class="wrap">
+  <p>Written by Islem Haddad, lead DevOps and platform engineer.</p>
+  <p><a href="index.html">Back to portfolio</a> or email <a href="mailto:Haddadislam64@gmail.com">Haddadislam64@gmail.com</a></p>
+</footer>
+
+</body>
+</html>
