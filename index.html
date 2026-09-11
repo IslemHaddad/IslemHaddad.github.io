@@ -251,6 +251,22 @@
     </div>
   </section>
 
+  <section aria-labelledby="projects">
+    <h2 id="projects">Projects</h2>
+    <article class="item">
+      <h3><a href="https://github.com/IslemHaddad/davy-jones">Davy Jones</a>, a self-hosted infrastructure control room</h3>
+      <p>Small ops teams often run infrastructure on shared passwords, a spreadsheet of IPs and SSH keys scattered
+        across laptops. Davy Jones shows every VPN, host and service as a live node graph: click a node to open an SSH
+        terminal in the browser or run a saved command, and start, stop or diagnose Docker-based VPN clients from the same page.
+        It's one Go binary that embeds the React and TypeScript frontend. All data, SSH credentials included, is encrypted
+        with AES-256-GCM behind a Vault-style seal: the master key is split into 5 Shamir shares, any 3 unseal it, and it
+        is never written to disk.
+        <span class="fact">Built with AI pairing under a written plan, with a compile and typecheck gate after each of eight
+          build phases, and a security review that caught a timing-based username enumeration bug and an export-path
+          injection before release. <a href="https://github.com/IslemHaddad/davy-jones">View the code on GitHub</a></span></p>
+    </article>
+  </section>
+
   <section aria-labelledby="writing">
     <h2 id="writing">Writing</h2>
     <article class="item">
